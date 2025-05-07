@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - ChronoEvents</title>
+    <link rel="icon" href="{{ url_for('static', filename='dash.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; /* Light background */
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+        .navbar {
+            background-color: #9966CC; /* Blue navbar color */
+        }
+        .dashboard-container {
+            margin-top: 20px;
+            background: linear-gradient(145deg, #ffffff, #5d5c8a);
+            border-radius: 10px;
+            box-shadow: 8px 8px 20px #d1d1d1, 2px 2px 1px #ffffff;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        .dashboard-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #9966CC;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .event-card {
+            border: 1px solid #007bff;
+            border-radius: 10px;
+            background-color: #ffffff;
+            margin-bottom: 15px;
+            padding: 15px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 0px 15px rgba(0, 123, 255, 0.5);
+        }
+        .contact-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #6c757d;
+            color: white;
+        }
+        .logout-btn {
+            width: 150px; /* Set a specific width for the logout button */
+            margin-top: 20px; /* Adjust the top margin */
+            display: block; /* Make it block-level */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto; /* Center horizontally */
+            transition: background-color 0.3s, transform 0.3s; /* Add transition */
+        }
+        .logout-btn:hover {
+            background-color: #dc3545; /* Darker red on hover */
+            transform: scale(1.05); /* Slightly increase size on hover */
+        }
+        .logout-container {
+            text-align: center; /* Center the logout button */
+            margin-top: 30px; /* Space above the button */
+        }
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; /* Button color */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; /* Darker on hover */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;">
+            ChronoEvents</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container dashboard-container">
+        <h1>Welcome to Your Dashboard</h1>
+        <h2>Your Registered Events</h2>
+
+        {% if events %}
+            <div class="event-list">
+                {% for event in events %}
+                <div class="event-card">
+                    <strong>Event ID: {{ event.event_id }}</strong><br>
+                    <strong>User ID: {{ event.id }}</strong><br>
+                    <strong>Authenticated: {{ event.authenticated }}</strong><br>
+                    <strong>Name:</strong> {{ event.name }}<br>
+                    <span class="badge contact-badge">{{ event.contact }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert"> ->No events registered.
+                <p> ->Want to know current available events? <a href="/" target="_blank"> Click here</a><br>
+                    ->Have an Event Id? <a href="/register_audience" target="_blank"> Click here</a></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="logout-container">
+        <a href="/logout" class="btn btn-danger logout-btn">Log out</a>
+    </div>
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> <!-- Moon icon as default -->
+    </button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; // State to track the background color
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; // Light lavender background color
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Switch to sun icon
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; // Purple background color
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Switch to moon icon
+            }
+            isPurple = !isPurple; // Toggle the state
+        });
+    </script>
+</body>
+</html>

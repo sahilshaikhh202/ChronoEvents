@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Event Registration System</title>
+    <link rel="icon" href="{{ url_for('static', filename='abt.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; 
+        }
+        .navbar {
+            background-color: #9966CC; 
+        }
+        .info-container {
+            max-width: 600px; 
+            background-color: #5d5c8a;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            text-align: center; 
+            margin: 50px auto; 
+        }
+        h4 {
+            margin-bottom: 20px; 
+            font-weight: bold;
+            color: #e6e6ff; 
+        }
+        .team-member {
+            margin: 20px 0; 
+            padding: 15px;
+            background-color: #5d5c8a; 
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .team-member img {
+            border-radius: 50%; 
+            width: 80px; 
+            height: 80px; 
+            margin-bottom: 10px; 
+        }
+        .team-member h5 {
+            color: #333; 
+        }
+        .footer {
+            background-color: #9966CC; 
+            padding: 20px; 
+            color: white; 
+            text-align: center; 
+            position: relative; 
+            margin-top: 30px; 
+        }
+        .social-icons a {
+            color: #333333; 
+            margin: 0 10px; 
+            text-decoration: none; 
+        }
+        #profile::after {
+            display: none;
+        } 
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; 
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; 
+            transform: scale(1.1); 
+        }      
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" style="z-index: 1000; position: relative;">
+    <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;"> 
+        ChronoEvents
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            {% if session['user_id'] %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Register
+                </a>
+                <div class="dropdown-menu" aria-labelledby="registerDropdown" style="z-index: 1000; position: absolute;">
+                    <a class="dropdown-item" href="/register_organizer">Organizer</a>
+                    <a class="dropdown-item" href="/register_audience">Audience</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/authentication">Authentication</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/organizer_login">Organizer Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About Us</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a id="profile" class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img src="{{ url_for('static', filename='people.png') }}" alt="Profile" width="30" height="30" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown" style="z-index: 1000; position: absolute;">
+                    <a class="dropdown-item" href="/user_dashboard">Dashboard</a>
+                    <a class="dropdown-item" href="/logout">Sign Out</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="/signup">Sign Up</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Log In</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="info-container">
+        <h4>About Us</h4>
+        <h5>Welcome to ChronoEvents!</h5>
+        <p>We are the Event Registration System team, dedicated to providing a seamless experience for both event organizers and attendees. Whether you’re looking to create a new event or register for an existing one, we are here to assist you every step of the way!
+            Our platform aims to simplify the event management process, making it easier for you to connect, organize, and enjoy events. With a user-friendly interface and robust features, we ensure that your event experience is efficient and enjoyable.</p>
+        <p><strong>Contact:</strong> info@chronoevents.com</p>
+        <p><strong>Phone:</strong> (123) 456-7890</p>
+        <p>Thank you for choosing ChronoEvents!</p>
+    </div>
+    
+    <h4 class="text-center">Meet Our Team</h4>
+    <div class="team-member text-center">
+        <img src="{{ url_for('static', filename='images/jd.jpg') }}" alt="John Doe">
+        <h5>John Doe</h5>
+        <p>Event Coordinator</p>
+    </div>
+    <div class="team-member text-center">
+        <img src="{{ url_for('static', filename='images/js.jpg') }}" alt="Jane Smith">
+        <h5>Jane Smith</h5>
+        <p>Marketing Specialist</p>
+    </div>
+    <div class="team-member text-center">
+        <img src="{{ url_for('static', filename='images/mb.jpg') }}" alt="Michael Brown">
+        <h5>Michael Brown</h5>
+        <p>Technical Support</p>
+    </div>
+    <div class="team-member text-center">
+        <img src="{{ url_for('static', filename='images/ew.jpg') }}" alt="Emily White">
+        <h5>Emily White</h5>
+        <p>Design Lead</p>
+    </div>
+</div>
+
+<div class="footer">
+    <p>Connect with us on social media!</p>
+    <div class="social-icons">
+        <a href="https://www.instagram.com/sahilshaikhh_/profilecard/?igsh=cW1pb2R6MDZ3Zzho" target="_blank"><i class="fab fa-instagram"></i></a>
+        <!--<a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>  -->
+    </div>
+</div>
+
+<button id="toggle-bg" class="floating-button">
+    <i id="bg-icon" class="fas fa-sun"></i>
+</button>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    const toggleBtn = document.getElementById('toggle-bg');
+    const body = document.body;
+    const icon = document.getElementById('bg-icon');
+    let isPurple = true;
+
+    toggleBtn.addEventListener('click', () => {
+        if (isPurple) {
+            body.style.backgroundColor = '#E6E6FA'; 
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        } else {
+            body.style.backgroundColor = '#1a1a2e'; 
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+        isPurple = !isPurple; 
+    });
+</script>
+</body>
+</html>

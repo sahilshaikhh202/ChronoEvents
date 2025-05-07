@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Organizer</title>
+    <link rel="icon" href="{{ url_for('static', filename='org.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; /* Matching background color */
+            font-family: 'Arial', sans-serif; /* Modern font style */
+        }
+        .navbar {
+            background-color: #9966CC; /* Teal navbar color */
+        }
+
+        .navbar-brand, .nav-link {
+            color: #1a1a2e; /* White text in navbar */
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #1a1a2e; /* Gold on hover */
+        }
+
+        .container {
+            background-color: #5d5c8a; /* White background for form container */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1a1a2e; /* Blue header color */
+            margin-bottom: 20px; /* Space below header */
+        }
+
+        .form-group label {
+            font-weight: bold; /* Bold labels */
+            color: #333; /* Dark text color */
+        }
+
+        .required {
+            color: red; /* Red asterisk for required fields */
+        }
+
+        .btn-primary {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            background-color: #28a745; /* Green submit button */
+            border: none; /* No border */
+        }
+
+        .btn-primary:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: scale(1.05);
+        }
+
+        .alert {
+            margin-top: 20px; /* Space above alerts */
+        }
+        #profile::after {
+            display: none;
+        }
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; /* Button color */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; /* Darker on hover */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }
+    </style>
+    <script>
+        function validateForm(event) {
+            const nameField = document.getElementById('name');
+            const contactField = document.getElementById('contact');
+            const eventNameField = document.getElementById('event-name');
+            const dateField = document.getElementById('date');
+            const startTimeField = document.getElementById('start-time');
+            const endTimeField = document.getElementById('end-time');
+            const locationField = document.getElementById('location');
+            const permissionYes = document.getElementById('permission-yes');
+            const permissionNo = document.getElementById('permission-no');
+            const eventTypePrivate = document.getElementById('event-type-private');
+            const eventTypeOpen = document.getElementById('event-type-open');
+            const descriptionField = document.getElementById('description');
+
+            const contactNumberPattern = /^\d{10}$/;
+
+            if (!eventNameField.value.trim()) {
+                alert('Please enter the event name.');
+                eventNameField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!nameField.value.trim()) {
+                alert('Please enter the organizer\'s name.');
+                nameField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!contactNumberPattern.test(contactField.value)) {
+                alert('Please enter a valid 10-digit contact number.');
+                contactField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!dateField.value) {
+                alert('Please select a date for the event.');
+                dateField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!startTimeField.value) {
+                alert('Please select a start time for the event.');
+                startTimeField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!endTimeField.value) {
+                alert('Please select an end time for the event.');
+                endTimeField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!locationField.value.trim()) {
+                alert('Please enter the event location.');
+                locationField.focus();
+                event.preventDefault();
+                return;
+            }
+
+            if (!permissionYes.checked && !permissionNo.checked) {
+                alert('Please indicate whether you have government permission.');
+                event.preventDefault();
+                return;
+            }
+
+            if (!eventTypePrivate.checked && !eventTypeOpen.checked) {
+                alert('Please select whether the event is private or open for all.');
+                event.preventDefault();
+                return;
+            }
+
+            if (eventTypeOpen.checked && descriptionField.value.length > 100) {
+                alert('Description cannot exceed 100 characters.');
+                descriptionField.focus();
+                event.preventDefault();
+                return;
+            }
+        }
+
+        function toggleDescription() {
+            const descriptionDiv = document.getElementById('description-div');
+            const eventTypeOpen = document.getElementById('event-type-open');
+            descriptionDiv.style.display = eventTypeOpen.checked ? 'block' : 'none';
+        }
+
+        function toggleSubmitButton() {
+            const permissionYes = document.getElementById('permission-yes');
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = !permissionYes.checked; 
+        }
+    </script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;">
+        ChronoEvents</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Register
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/register_organizer">Organizer</a>
+                    <a class="dropdown-item" href="/register_audience">Audience</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/authentication">Authentication</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About Us</a>
+            </li>
+
+            {% if user_logged_in %}
+            <!-- Profile Dropdown for Logged-In Users -->
+            <li class="nav-item dropdown">
+                <a id="profile" class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img src="{{ url_for('static', filename='people.png') }}" alt="Profile" width="30" height="30" class="rounded-circle">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                    <a class="dropdown-item" href="/user_dashboard">Dashboard</a>
+                    <a class="dropdown-item" href="/logout">Sign Out</a>
+                </div>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+
+    <!-- Organizer Registration Form -->
+    <div class="container mt-5 my-5">
+        <h2 class="text-center">Organizer Registration Form</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {% for category, message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" onsubmit="validateForm(event)">
+            <div class="form-group">
+                <label for="event-name">Event Name: <span class="required">*</span></label>
+                <input type="text" class="form-control" id="event-name" name="event-name" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Organizer's Name: <span class="required">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Number: <span class="required">*</span></label>
+                <input type="text" class="form-control" id="contact" name="contact" maxlength="10" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Event Date: <span class="required">*</span></label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="start-time">Start Time: <span class="required">*</span></label>
+                <input type="time" class="form-control" id="start-time" name="start-time" required>
+            </div>
+            <div class="form-group">
+                <label for="end-time">End Time: <span class="required">*</span></label>
+                <input type="time" class="form-control" id="end-time" name="end-time" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Event Location: <span class="required">*</span></label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <div class="form-group">
+                <label>Do you have government permission? <span class="required">*</span></label><br>
+                <label>
+                    <input type="radio" id="permission-yes" name="permission" value="yes" onclick="toggleSubmitButton()"> Yes
+                </label>
+                <label>
+                    <input type="radio" id="permission-no" name="permission" value="no" onclick="toggleSubmitButton()"> No
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Is this a private event or open to all? <span class="required">*</span></label><br>
+                <label>
+                    <input type="radio" id="event-type-private" name="event-type" value="private" onclick="toggleDescription()"> Private
+                </label>
+                <label>
+                    <input type="radio" id="event-type-open" name="event-type" value="ofa" onclick="toggleDescription()"> Open
+                </label>
+            </div>
+            <div class="form-group" id="description-div" style="display:none;">
+                <label for="description">Provide a brief description (max 100 characters):</label>
+                <textarea class="form-control" id="description" name="description" maxlength="100"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-button" disabled>Register Organizer</button>
+        </form>
+    </div>
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> <!-- Moon icon as default -->
+    </button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; // State to track the background color
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; // Light lavender background color
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Switch to sun icon
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; // Purple background color
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Switch to moon icon
+            }
+            isPurple = !isPurple; // Toggle the state
+        });
+    </script>
+</body>
+
+</html>

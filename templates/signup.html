@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ChronoEvents</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e;
+            overflow: hidden; /* Prevent scrolling during animation */
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #9966CC;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        /* Form container styles */
+        .form-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #5d5c8a;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out; /* Animation for the form */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            animation: slideIn 0.5s ease forwards; /* Animation for heading */
+            opacity: 0; /* Start hidden for animation */
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: calc(100% - 40px); /* Ensures padding on both sides */
+            padding: 10px;
+            margin: 10px 0; /* Space between fields */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding in width calculation */
+            margin-left: auto; /* Center the input */
+            margin-right: auto; /* Center the input */
+            transition: border-color 0.3s, box-shadow 0.3s; /* Transition for focus effect */
+        }
+
+        input:focus {
+            border-color: #5cb85c;
+            box-shadow: 0 0 5px rgba(92, 184, 92, 0.6); /* Glow effect */
+            outline: none; /* Remove default outline */
+        }
+
+        button {
+            width: 70%; /* Adjust the button width */
+            padding: 10px;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px auto; /* Center the button */
+            display: block; /* Make button block-level */
+            transition: transform 0.3s, background-color 0.3s; /* Transition for hover effect */
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+            transform: scale(1.05); /* Slightly enlarge on hover */
+        }
+
+        p {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #ff7f50;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error message styles */
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 15px;
+            display: {% if error %} block {% else %} none {% endif %}; /* Show/hide based on error */
+            animation: fadeIn 0.5s ease-in-out; /* Animation for the error message */
+        }
+
+        /* Error animation styles */
+        .error {
+            animation: shake 0.5s ease-in-out; /* Shake effect for error */
+            border-color: red; /* Change border color to red */
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; /* Button color */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; /* Darker on hover */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar" >
+        <a href="/" style="color :#1a1a2e;">
+        <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;">   ChronoEvents
+        </a>
+        <a href="/login" style="color :#1a1a2e;">Log In</a>
+    </div>
+
+    <div class="form-container">
+        <h2>Sign Up</h2>
+        {% if error %}
+        <div class="error-message">Error creating account. Please try again.</div>
+        {% endif %}
+        <form action="/signup" method="POST">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required class="{% if error %}error{% endif %}">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required class="{% if error %}error{% endif %}">
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required class="{% if error %}error{% endif %}">
+
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="/login">Log in here</a>.</p>
+    </div>
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> <!-- Moon icon as default -->
+    </button>
+    <script>
+        
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; // State to track the background color
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; // Light lavender background color
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Switch to sun icon
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; // Purple background color
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Switch to moon icon
+            }
+            isPurple = !isPurple; // Toggle the state
+        });
+    </script>
+</body>
+</html>

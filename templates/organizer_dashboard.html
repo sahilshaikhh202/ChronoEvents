@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='dash.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; /* Purple background color */
+        }
+        .navbar {
+            background-color: #9966CC; /* Blue navbar color */
+        }
+        .custom-table {
+            background-color: #f8f9fa; /* Light background */
+            color: #1a1a2e; /* Text color */
+            border: 1px solid #5d5c8a; /* Border color */
+            border-radius: 10px; /* Rounded corners for the table */
+            overflow: hidden; /* Ensures content stays within the rounded corners */
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+        }
+    
+        .custom-table:hover {
+            background-color: #e0e1f7; /* New background on hover */
+            transform: scale(1.02); /* Slight scaling effect on hover */
+        }
+    
+        .custom-table th {
+            background-color: #5d5c8a; /* Header background color */
+            color: white; /* Header text color */
+        }
+    
+        .custom-table td, .custom-table th {
+            border: 1px solid #5d5c8a; /* Border color */
+        }
+    
+        .custom-table tr:hover {
+            background-color: #d0d2eb; /* Row hover background */
+        }
+    
+        .custom-table thead tr:first-child th:first-child {
+            border-top-left-radius: 10px; /* Top-left corner */
+        }
+    
+        .custom-table thead tr:first-child th:last-child {
+            border-top-right-radius: 10px; /* Top-right corner */
+        }
+    
+        .custom-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 10px; /* Bottom-left corner */
+        }
+    
+        .custom-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 10px; /* Bottom-right corner */
+        } 
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; /* Button color */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; /* Darker on hover */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }   
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light" >
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;">
+            ChronoEvents
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/organizer_logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container mt-5">
+        <h2 class="text-center" style="color: #9966CC">Organizer Dashboard</h2>
+        <p style="color: white;">Welcome, Organizer! Here you can check the attendees registered for your event.</p>
+        
+        {% if attendees %}
+    <table class="table table-bordered custom-table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendee in attendees %}
+            <tr>
+                <td>{{ attendee.id }}</td>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.email }}</td>
+                <td>{{ attendee.contact }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No attendees registered for this event.</p>
+{% endif %}
+
+    </div>
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> <!-- Moon icon as default -->
+    </button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; // State to track the background color
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; // Light lavender background color
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Switch to sun icon
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; // Purple background color
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Switch to moon icon
+            }
+            isPurple = !isPurple; // Toggle the state
+        });
+    </script>
+</body>
+</html>

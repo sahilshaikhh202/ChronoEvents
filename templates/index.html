@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoEvents</title>
+    <link rel="icon" href="{{ url_for('static', filename='home.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; 
+        }
+        .navbar {
+            background-color: #9966CC; 
+        }
+        .quality-container {
+            max-width: 65%; 
+            float: left; 
+        }
+        .current-events-container {
+            max-width: 30%; 
+            float: right; 
+            margin-left: 20px; 
+            background-color: #5d5c8a; 
+            padding: 15px;    
+            border-radius: 10px;
+            border: 1.5px solid #1a1a2e;
+            max-height: 400px; 
+            overflow-y: auto;
+        }
+        /* Custom Scrollbar */
+        .current-events-container::-webkit-scrollbar {
+            width: 12px;
+        }
+        .current-events-container::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 8px;
+        }
+        .quality-section {
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .quality-section:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .quality-one { background-color: #5d5c8a; }
+        .quality-two { background-color: #5d5c8a; }
+        .quality-three { background-color: #5d5c8a; }
+        .card { margin-bottom: 15px; }
+        #profile::after {
+            display: none;
+        } 
+        .card {
+            margin-bottom: 15px;
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .card.show-card {
+            opacity: 1;
+            transform: translateY(0); 
+        }
+        .modal-content {
+            transform: scale(0.7);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .modal.fade .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        #profile img {
+            transition: box-shadow 0.3s ease, filter 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 1); 
+        }
+        #profile img:hover {
+            box-shadow: 0 4px 12px rgbargba(255, 0, 255, 0.6); 
+            filter: brightness(1); 
+        }
+        .btn {
+            border-radius: 30px; 
+            background: linear-gradient(45deg, #9966CC, #5d5c8a); 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05); 
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); 
+        }
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; 
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; 
+            transform: scale(1.1); 
+        }
+        .lightbox-container {
+            background-color: #5d5c8a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    
+        .lightbox-img {
+            width: 90%;
+            height: auto;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+    
+        .lightbox-img:hover {
+            transform: scale(1.5); 
+            opacity: 2; 
+        }
+    
+        .lightbox-img:not(:hover) {
+            opacity: 0.5; 
+        }
+        .container.lightbox-container {
+            clear: both; 
+        }
+        .success-stats-section {
+            padding: 50px 0;
+            text-align: center;
+            background-color: #5d5c8a;
+            color: #333; 
+        }
+        .success-heading .success-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #000; 
+        }
+        .counters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        .counter-item {
+            background-color: #f0f0f0; 
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .counter-number {
+            font-size: 40px;
+            font-weight: bold;
+            color: #4b9cea; 
+        }
+        .counter-description {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;"> <!-- Replace with your icon filename -->
+            ChronoEvents
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+    
+                {% if session['user_id'] %}
+                <!-- Authenticated User Links -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Register
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="registerDropdown">
+                        <a class="dropdown-item" href="/register_organizer">Organizer</a>
+                        <a class="dropdown-item" href="/register_audience">Audience</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/authentication">Authentication</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/organizer_login">Organizer Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About Us</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a id="profile" class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ url_for('static', filename='people.png') }}" alt="Profile" width="30" height="30" class="rounded-circle">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="/user_dashboard">Dashboard</a>
+                        <a class="dropdown-item" href="/logout">Sign Out</a>
+                    </div>
+                </li>
+                {% else %}
+                <!-- Guest User Links -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Log In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About Us</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+        
+
+    <!-- Quality Section -->
+    <div class="container mt-5 quality-container">
+        <div class="quality-section quality-one">
+            <h1>Easy Registration</h1>
+            <p>Our event registration process is simple and user-friendly, ensuring attendees can sign up without any hassle.</p>
+        </div>
+        <div class="quality-section quality-two">
+            <h1>Secure Authentication</h1>
+            <p>We prioritize security, implementing robust authentication methods to protect user data during the registration process.</p>
+        </div>
+        <div class="quality-section quality-three">
+            <h1>Real-Time Updates</h1>
+            <p>Stay informed with real-time updates on event details, ensuring you never miss out on important announcements.</p>
+        </div>
+    </div>
+
+    <!-- Current Events Section -->
+    <div class="container mt-5 current-events-container">
+        <div class="current-events-title">
+            <h2 class="text-center text-dark">Current Events</h2>
+        </div>
+
+        <!-- Dynamic Event Cards -->
+        {% for event in ofa_events %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Event Name: {{ event.event_name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Event ID: {{ event.event_id }}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">Event Date: {{ event.date }}</h6>
+                <p class="card-text">Time: {{ event.start_time }} to {{ event.end_time }}</p>
+                <p class="card-text">Description: {{ event.description if event.description else 'No description available.' }}</p>
+                {% if session['user_id'] %}
+                <a href="{{ url_for('register_audience', event_id=event.event_id) }}" class="btn btn-primary">Register Now!</a>
+                {% else %}
+                <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#loginModal">Register Now!</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if not ofa_events %}
+        <p class="text-center">No current events available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Recent Event Modal -->
+    <div class="modal fade" id="recentEventModal" tabindex="-1" role="dialog" aria-labelledby="recentEventModalLabel" aria-hidden="true" >
+        <div class="modal-dialog" role="document" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recentEventModalLabel">Recent Event Announcement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Event Name: {{ recent_event.event_name }}</h5>
+                    <h6>Event ID: {{ recent_event.event_id }}</h6>
+                    <p>Description: {{ recent_event.description if recent_event.description else 'No description available.' }}</p>
+                    {% if session['user_id'] %}
+                    <a href="{{ url_for('register_audience', event_id=recent_event.event_id) }}" class="btn btn-primary">Register Now!</a>
+                    {% else %}
+                    <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#loginModal">Register Now!</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Please log in first to register for the event.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="/login" class="btn btn-primary">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear floats before lightbox -->
+    <div style="clear: both;"></div>
+
+    <!-- Image Lightbox Section -->
+    <div class="container lightbox-container mt-5 my-5">
+        <h2 class="text-center text-light">Recent Event Highlights</h2>
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <img src="{{ url_for('static', filename='image1.jpg') }}" alt="Image 1" class="lightbox-img">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <img src="{{ url_for('static', filename='image2.jpg') }}" alt="Image 2" class="lightbox-img">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <img src="{{ url_for('static', filename='image3.jpg') }}" alt="Image 3" class="lightbox-img">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <img src="{{ url_for('static', filename='image4.jpg') }}" alt="Image 4" class="lightbox-img">
+            </div>
+        </div>
+    </div>
+
+    <section class="success-stats-section animated fadeInUpShorter">
+        <div class="success-heading">
+            <h2 class="success-title">We’ve Successfully Completed Over 40+ Projects</h2>
+        </div>
+        <div class="counters-grid">
+            <div class="counter-item">
+                <h3 class="counter-number">2</h3>
+                <p class="counter-description">Seminars</p>
+            </div>
+            <div class="counter-item">
+                <h3 class="counter-number">20</h3>
+                <p class="counter-description">     Events       </p>
+            </div>
+            <div class="counter-item">
+                <h3 class="counter-number">20</h3>
+                <p class="counter-description">Private Gathering</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> 
+    </button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Show the recent event modal when the page loads
+            $('#recentEventModal').modal('show');
+        });
+        $('.card').each(function(index) {
+            $(this).delay(200 * index).queue(function(next) {
+                $(this).addClass('show-card');
+                next();
+            });
+        });
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; 
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; 
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); 
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; 
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); 
+            }
+            isPurple = !isPurple; 
+        });
+        const lightboxImages = document.querySelectorAll('.lightbox-image');
+
+    lightboxImages.forEach(image => {
+        image.addEventListener('mouseenter', () => {
+            
+            lightboxImages.forEach(img => {
+                if (img !== image) {
+                    img.classList.add('dimmed');
+                }
+            });
+        });
+
+        image.addEventListener('mouseleave', () => {
+            
+            lightboxImages.forEach(img => {
+                img.classList.remove('dimmed');
+            });
+        });
+    });
+    </script>
+</body>
+</html>

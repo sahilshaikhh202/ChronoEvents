@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Audience</title>
+    <link rel="icon" href="{{ url_for('static', filename='aud.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e; /* Matching background color */
+            font-family: 'Arial', sans-serif; /* Modern font style */
+        }
+        .navbar {
+            background-color: #9966CC; /* Teal navbar color */
+        }
+        .navbar-brand, .nav-link {
+            color: #1a1a2e; /* White text in navbar */
+        }
+
+        .navbar-brand:hover, .nav-link:hover {
+            color: #1a1a2e; /* Gold on hover */
+        }
+        .required-field {
+            color: red; /* Styling for required fields indicator */
+        }
+        .flash-message {
+            margin-top: 20px;
+        }
+        /* Fix for dropdown cutoff */
+        .navbar .dropdown-menu {
+            right: 0; /* Align dropdown menu to the right */
+            left: auto; /* Ensure it doesn't overflow */
+        }
+        /* Profile icon styling */
+        .profile-icon {
+            font-size: 1.5rem;
+            color: #000; /* Adjust color of the icon */
+        }
+        .navbar-nav {
+            align-items: center; /* Center align the profile icon */
+        }
+        #profile::after {
+            display: none;
+        }
+        .rounded-container {
+            background-color: #5d5c8a; /* Light background for contrast */
+            border-radius: 15px; /* Rounded edges */
+            padding: 30px; /* Padding around the content */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+            animation: fadeIn 0.5s ease; /* Fade-in animation */
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0; /* Start fully transparent */
+            }
+            to {
+                opacity: 1; /* End fully opaque */
+            }
+        }
+        /* Floating button styles */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #9966CC; /* Button color */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .floating-button:hover {
+            background-color: #5d5c8a; /* Darker on hover */
+            transform: scale(1.1); /* Slightly larger on hover */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg ">
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='home.ico') }}" alt="Icon" width="30" height="30" style="margin-right: 5px;">
+            ChronoEvents</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Register
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/register_organizer">Organizer</a>
+                        <a class="dropdown-item" href="/register_audience">Audience</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/authentication">Authentication</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About Us</a>
+                </li>
+
+                <!-- Profile icon for logged-in user -->
+                {% if user_logged_in %}
+                <li class="nav-item dropdown">
+                    <a id="profile" class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ url_for('static', filename='people.png') }}" alt="Profile" width="30" height="30" class="rounded-circle">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="/user_dashboard">Dashboard</a>
+                        <a class="dropdown-item" href="/logout">Sign Out</a>
+                    </div>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Message (Success or Failure) -->
+    <div class="container flash-message">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Audience Registration Form -->
+    <div class="container mt-5 rounded-container">
+        <h2 class="text-center" style="color: #1a1a2e;">Register as Audience</h2>
+        <form method="POST" action="/register_audience" onsubmit="validateForm(event)">
+            <div class="form-group">
+                <label for="name" style="color: #1a1a2e;">Name <span class="required-field">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email" style="color: #1a1a2e;">Email <span class="required-field">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="contact" style="color: #1a1a2e;">Contact Number <span class="required-field">*</span></label>
+                <input type="tel" class="form-control" id="contact" name="contact" required>
+            </div>
+            <div class="form-group">
+                <label for="event_id" style="color: #1a1a2e;">Event ID <span class="required-field">*</span></label>
+                <input type="text" class="form-control" id="event_id" name="event_id" value="{{ event_id }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+    <!-- Floating Button -->
+    <button id="toggle-bg" class="floating-button">
+        <i id="bg-icon" class="fas fa-sun"></i> <!-- Moon icon as default -->
+    </button>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const toggleBtn = document.getElementById('toggle-bg');
+        const body = document.body;
+        const icon = document.getElementById('bg-icon');
+        let isPurple = true; // State to track the background color
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPurple) {
+                body.style.backgroundColor = '#E6E6FA'; // Light lavender background color
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon'); // Switch to sun icon
+            } else {
+                body.style.backgroundColor = '#1a1a2e'; // Purple background color
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun'); // Switch to moon icon
+            }
+            isPurple = !isPurple; // Toggle the state
+        });
+    </script>
+</body>
+</html>
